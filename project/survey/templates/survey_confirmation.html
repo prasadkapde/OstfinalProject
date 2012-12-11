@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1 id="">Survey Confirmation</h1>
+    <form action='/'>
+        	{{survey}} added successfully<br>
+		The Valid Options For The Survey Are:
+		{% for i in option %}
+		<br>{{i}}
+		{% endfor %}
+        <p><input type="submit" value="Go Back To Home Page!"/></p>
+    </form>
+{% endblock %}
+

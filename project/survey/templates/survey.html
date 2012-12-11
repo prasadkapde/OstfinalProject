@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1 id="">Create a Survey</h1>
+    <form action='/addsurvey'>	
+	Survey Name:<input type="text" name=sname value="Survey Name"><br>
+	Options    :<input type="text" name= options value="options"><br>
+    	<p><input type="submit" value="Go!"/></p>
+    </form>
+{% endblock %}

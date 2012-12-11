@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+	{{data}}
+	<form method=get action=startup>
+	<input type=radio name=startup value=create>Create A New Survey<br>
+	<input type=radio name=startup value=listmysurvey>List My Surveys<br>
+	<input type=radio name=startup value=listallsurvey>List All Surveys<br>
+	<input type=radio name=startup value=addItems>Add Items To My Survey<br>
+	<input type=radio name=startup value=delItems>Delete Items From My Survey<br>
+	<input type=radio name=startup value=delete>Delete<br>
+	<input type=radio name=startup value=vote checked>Vote!<br>
+	<input type=submit value="Go!!">
+{% endblock %}

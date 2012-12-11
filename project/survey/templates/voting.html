@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% if path == 'vote' %}
+    <h1 id="">Vote for {{surveys}} by {{user}}</h1>
+    <form action='/registervote'>
+        {% for i in options %}
+                        {% set c = i.replace(" ","__") %}
+                        <br><input type=radio name=voteon value={{c}} checked>{{i}}
+        {% endfor %}
+	<input type=hidden name=survey value={{surveys}}>
+	<input type=hidden name=user value={{user}}>
+	<p><input type="submit" value="Vote!"/></p>
+    </form>
+    <form action='/viewresults'>
+	<input type=hidden name=survey value={{surveys}}>
+        <input type=hidden name=user value={{user}}>
+        <input type="submit" value="View Results!"/>
+    </form>
+    <form action='/'>
+        <input type="submit" value="Go Back To Home Page!"/>
+    </form>
+    {% else %}
+    <h1 id="">Delete Item From {{surveys}}</h1>
+    <form action='/deleteItem'>
+	{% for i in options %}
+                        {% set c = i.replace(" ","__") %}
+                        <br><input type=radio name=voteon value={{c}} checked>{{i}}
+        {% endfor %}
+	<input type=hidden name=survey value={{surveys}}>
+	<input type=hidden name=options value={{options}}>
+        <p><input type="submit" value="Delete!"/></p>
+    </form>
+   {% endif %}
+{% endblock %}
+
