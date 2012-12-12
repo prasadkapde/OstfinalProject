@@ -15,12 +15,21 @@
 		<form action='/addItems'>
 		{% for i in surveys %}
                 {% set c = i.replace(" ","__") %}
-                <br><input type=radio name=voteon value={{c}} checked>{{i}}
+                <br><input type=radio name=addon value={{c}} checked>{{i}}
 	        {% endfor %}
 		<p>Add These Items To The Selected Survey<input type=text name=additems /></p>
 		<p><input type="submit" value="Add Items To This Survey"/></p>
 		</form>
 	{% else %}
+		{% if path == 'download' %}
+			<form action='/download'>
+	        	        {% for i in surveys %}
+        	       			 {% set c = i.replace(" ","__") %}
+		                	 <br><input type=radio name=voteon value={{c}} checked>{{i}}
+              		        {% endfor %}
+				<p><input type=submit value="Download This Survey"></p>
+			</form>
+		{% else %}
 		<form action='/generatevotingpage'>
 		{% for i in surveys %}
                 {% set c = i.replace(" ","__") %}
@@ -29,6 +38,7 @@
 		<input type=hidden name=delete value=delete />
 		<p><input type="submit" value="Delete Items From This Survey"/></p>
         	</form>
+		{% endif %}
 	{% endif %}
 	{% endif %}
 {% endblock %}

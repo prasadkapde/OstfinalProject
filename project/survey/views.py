@@ -3,11 +3,14 @@ from survey.models import Survey
 from survey.models import Item
 from survey.models import Vote
 from survey.models import VoteValidator
+from survey.models import UploadData
 from flask import request, render_template, redirect, flash, url_for
+from flask import Response
 import cgi
 import cgitb
 from google.appengine.ext import db
 from google.appengine.api import users
+import xml.dom.minidom
 cgitb.enable();
 
 @app.route('/index')
@@ -31,14 +34,17 @@ def startup():
 			name1 = sur.name+" by " + str(user);
 			listOfSurveys.append(name1);
         	return render_template('listsurveys.html',surveys=listOfSurveys,for_user=user,path="vote");
-	if (form['startup'].value == "listallsurvey"):
+	if (form['startup'].value == "listallsurvey" or form['startup'].value == "download"):
                 user = users.get_current_user();
                 surveys = db.GqlQuery("SELECT * FROM Survey");
                 listOfSurveys = [];
                 for sur in surveys:
 			val = sur.name+" by " + str(sur.owner);
                         listOfSurveys.append(val);
-                return render_template('listsurveys.html',surveys=listOfSurveys,for_user="All Users",path="vote");
+		if (form['startup'].value == "listallsurvey"):
+	                return render_template('listsurveys.html',surveys=listOfSurveys,for_user="All Users",path="vote");
+		else:
+			return render_template('listsurveys.html',surveys=listOfSurveys,for_user="All Users",path="download");
 	if (form['startup'].value == "delete"):
 		db.delete(db.Query());
 		return 'done';
@@ -58,7 +64,8 @@ def startup():
                         name1 = sur.name+" by " + str(user);
                         listOfSurveys.append(name1);
                 return render_template('listsurveys.html',surveys=listOfSurveys,for_user=str(user),path="delete");
-			
+	if (form['startup'].value == "upload"):			
+		return render_template('upload.html');
 @app.route('/addsurvey')
 def addSurvey():
 	form = cgi.FieldStorage();
@@ -99,14 +106,13 @@ def generateVotingPage():
 		path="delete";
 	rawOption = form['voteon'].value;
 	optionList = rawOption.split("__by__");
-	#_ote('listsurveys.html',surveys=listOfSurveys,for_user="All Users",path=vote);iptionList[1];
 	surveyName = optionList[0].replace("__"," ");
 	user = users.User(optionList[1]);
 	itemList = db.GqlQuery("SELECT * FROM Item WHERE survey = :1 and owner = :2",surveyName,user);
 	options = [];
 	for i in itemList:
 		options.append(i.name);
-	return render_template('voting.html',surveys=optionList[0],user=user,options=options,path=path);
+	return render_template('voting.html',surveys=surveyName,user=user,options=options,path=path);
 
 @app.route('/registervote')
 def registerVote():
@@ -153,7 +159,33 @@ def viewResults():
 
 @app.route('/addItems')
 def addItems():
-	return "add";
+	form = cgi.FieldStorage();
+        user = users.get_current_user();
+        sName = form['addon'].value;
+	sName1 = sName.split("__by__");
+	sName2 = sName1[0]; 
+	surveyName = sName2.replace("__"," ");
+        rawOptions = form['additems'].value;
+        rawOptions += ',';
+        optionList = rawOptions.split(',');
+        surveys = db.GqlQuery("SELECT * FROM Survey WHERE name = :1 and owner = :2",surveyName,user);
+	oldItemList = [];
+	for sur in surveys:
+		if (sur.name == surveyName):
+			oldItemList = sur.values;
+	for newItems in optionList:
+		oldItemList.append(newItems);
+	newItemList = oldItemList;
+	db.delete(surveys);
+	newSurvey = Survey(name=surveyName,owner=user,values=newItemList);
+	newSurvey.put();
+	for option in optionList:
+                        if option:
+                                item = Item(name=option);
+                                item.survey = surveyName;
+                                item.owner = user;
+	                        item.put();
+	return render_template('survey_confirmation.html',survey=surveyName,option=optionList);
 
 @app.route('/deleteItem')
 def deleteItem():
@@ -177,4 +209,45 @@ def deleteItem():
 	newSurvey.put();
 	oldItem = db.GqlQuery("SELECT * FROM Item WHERE name = :1 and owner = :2 and survey = :3",item,owner,survey);
 	db.delete(oldItem);
-	return render_template('survey_confirmation.html',survey=survey,option=oldValues);	
+	return render_template('survey_confirmation.html',survey=survey,option=oldValues);
+
+@app.route('/uploadfile',methods=['GET','POST'])
+def uploadFile():
+		form = cgi.FieldStorage();
+		item = form["filename"];
+		data = "";
+		if item.file:
+			data = item.file;
+		doc = xml.dom.minidom.parse(data)
+		items = doc.getElementsByTagName("NAME");
+		owner = users.get_current_user();
+		optionList = [];
+		for node in items:
+			optionList.append(node.firstChild.nodeValue);
+		surveyName = optionList[0];
+		optionList.remove(surveyName);
+		newSurvey = Survey(name=surveyName,owner=owner,values=optionList);
+		newSurvey.put();
+		for item in optionList:
+			newItem = Item(name=item,survey=surveyName,owner=owner);
+			newItem.put();
+		return render_template('survey_confirmation.html',survey=surveyName,option=optionList);
+@app.route('/download')
+def download():
+	form = cgi.FieldStorage();
+	rawOption = form['voteon'].value;
+        optionList = rawOption.split("__by__");
+        surveyName = optionList[0].replace("__"," ");
+        user = users.User(optionList[1].strip());
+	items = db.GqlQuery("SELECT * FROM Item WHERE owner = :1 and survey = :2",user,surveyName.strip());
+	itemList = [];
+	for item in items:
+		itemList.append(item.name);
+	def generate():
+		textdata = "<CATEGORY>" + "\n" + "<NAME>" + surveyName +"</NAME>" + "\n";
+		yield textdata;
+		for i in itemList:
+			text = "<ITEM>"+ "\n" + "<NAME>" + i + "</NAME>" + "\n" + "</ITEM>" + "\n";
+			yield text;
+		yield "</CATEGORY>";
+	return Response(generate(), mimetype='text/csv');

@@ -21,4 +21,6 @@ class VoteValidator(db.Model):
 	name=db.StringProperty();
         owner=db.UserProperty();
         survey=db.StringProperty();
-        voter=db.UserProperty();	
+        voter=db.UserProperty();
+class UploadData(db.Model):
+	data=db.BlobProperty();	

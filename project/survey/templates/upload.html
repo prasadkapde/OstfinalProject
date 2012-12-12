@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+	<h1> Upload The Xml File Having Survey data </h1>
+	<form method=POST enctype="multipart/form-data" action=/uploadfile>
+	<input type = file name=filename>
+	<input type= submit value =Upload>
+{% endblock %}
+
