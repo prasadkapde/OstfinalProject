@@ -1,13 +1,15 @@
 from survey import app
 from survey.models import Survey
 from survey.models import Item
-from survey.models import Vote
+from survey.models import Vote, Comments, CommentValidator, Search
 from survey.models import VoteValidator
 from survey.models import UploadData
 from flask import request, render_template, redirect, flash, url_for
 from flask import Response
 import cgi
 import cgitb
+import re
+import datetime;
 from google.appengine.ext import db
 from google.appengine.api import users
 import xml.dom.minidom
@@ -66,6 +68,7 @@ def startup():
                 return render_template('listsurveys.html',surveys=listOfSurveys,for_user=str(user),path="delete");
 	if (form['startup'].value == "upload"):			
 		return render_template('upload.html');
+
 @app.route('/addsurvey')
 def addSurvey():
 	form = cgi.FieldStorage();
@@ -74,19 +77,32 @@ def addSurvey():
 	rawOptions = form['options'].value;
 	rawOptions += ',';
 	optionList = rawOptions.split(',');
+	expireDate = form['dateValue'].value;
+	expireHour = int(form['hours'].value);
+	expireMinutes = int(form['minutes'].value);
+	expireSeconds = int(form['seconds'].value);
+	rawDate = expireDate.split("/");
+	month = int(rawDate[0]);
+	day = int(rawDate[1]);
+	year = int(rawDate[2]);
+	surveyExpireDate = datetime.datetime(year,month,day,expireHour,expireMinutes,expireSeconds);
 	surveys = db.GqlQuery("SELECT * FROM Survey WHERE name = :1 and owner = :2",surveyName,user);
 	counter = surveys.count();
 	if (counter == 0):
-		survey = Survey(name=surveyName);
+		survey = Survey(name=surveyName,expiration=surveyExpireDate);
 		survey.values = optionList;
 		survey.owner = user;
 		survey.put();
+		search = Search(name=surveyName,entityType="survey",survey=surveyName,owner=user);
+		search.put();
 		for option in optionList:
 			if option:
 				item = Item(name=option);
 				item.survey = surveyName;
 				item.owner = user;
 				item.put();
+				search1 = Search(name=option,entityType="item",survey=surveyName,owner=user);
+				search1.put();
 		return render_template('survey_confirmation.html',survey=surveyName,option=optionList);
 	else:
 		return render_template('failure.html',message="You already have created this survey! Please create a different survey.");
@@ -117,35 +133,72 @@ def generateVotingPage():
 @app.route('/registervote')
 def registerVote():
 	form = cgi.FieldStorage();
-	voteon = form['voteon'].value;
-	vote = voteon.replace("__"," ");
-	survey = form['survey'].value;
-	user = form['user'].value;
-	user1 = users.User(user);
-	voter = users.get_current_user();
-	isvoted = db.GqlQuery("SELECT * FROM VoteValidator WHERE survey = :1 and owner = :2 and voter = :3",survey,user1,voter);
-	counter = isvoted.count();
-	if ( counter == 0 ):
-		winnerVote = db.GqlQuery("SELECT * FROM Vote WHERE owner = :1 and survey = :2 and name = :3",user1,survey,vote);
-		win_number = 1;
-		for i in winnerVote:
-			win_number = i.win;
-			win_number += 1;
-		db.delete(winnerVote);
-		newVote = Vote(name=vote,survey=survey,owner=user1,win=win_number);
-		newVote.put();
-		voteValidator = VoteValidator(name=vote,survey=survey,owner=user1,voter=voter);
-		voteValidator.put();		
-		return render_template('successful_voting.html',winner=vote,looser=" All Others.");
+	if(form.has_key('vote')):
+		voteon = form['voteon'].value;
+		vote = voteon.replace("__"," ");
+		surveyName = form['survey'].value;
+		survey = surveyName.replace("__"," ");
+		user = form['user'].value;
+		user1 = users.User(user);
+		voter = users.get_current_user();
+		surveyData = db.GqlQuery("SELECT * FROM Survey WHERE name =:1 and owner =:2",survey,user1);
+		expireDate = "";
+		for sur in surveyData:
+			expireDate = sur.expiration;
+		now = datetime.datetime.now();
+		if (expireDate < now):
+			return render_template('failure.html',message="This survey has expired. You can still view its result!");
+		isvoted = db.GqlQuery("SELECT * FROM VoteValidator WHERE survey = :1 and owner = :2 and voter = :3",survey,user1,voter);
+		counter = isvoted.count();
+		if ( counter == 0 ):
+			winnerVote = db.GqlQuery("SELECT * FROM Vote WHERE owner = :1 and survey = :2 and name = :3",user1,survey,vote);
+			win_number = 1;
+			for i in winnerVote:
+				win_number = i.win;
+				win_number += 1;
+			db.delete(winnerVote);
+			newVote = Vote(name=vote,survey=survey,owner=user1,win=win_number);
+			newVote.put();
+			voteValidator = VoteValidator(name=vote,survey=survey,owner=user1,voter=voter);
+			voteValidator.put();		
+			return render_template('successful_voting.html',winner=vote,looser=" All Others.");
+		else:
+			return render_template('failure.html',message="You already have voted this survey!");
 	else:
-		return render_template('failure.html',message="You already have voted this survey!");
+		voteon = form['voteon'].value;
+		vote = voteon.replace("__"," ");
+		survey = form['survey'].value;
+		surveyName = survey.replace("__"," ");
+		user = form['user'].value;
+		user1 = users.User(user);
+		commenter = users.get_current_user();
+		isCommented = db.GqlQuery("SELECT * FROM CommentValidator WHERE itemName = :1 AND itemOwner = :2 AND survey = :3 AND commenter = :4",vote,user1,surveyName,commenter);
+		counter = isCommented.count();
+		if(counter == 0):
+				previousComment = db.GqlQuery("SELECT * FROM Comments WHERE itemName = :1 AND itemOwner = :2 AND survey = :3",vote,user1,surveyName);
+				comment1 = "";
+				for pre in previousComment:
+					comment1 = pre.comment;
+				newComment = comment1+str(commenter) + " said: "+form['commentText'].value + "; ";
+				comment = Comments(itemName=vote,itemOwner=user1,survey=surveyName,comment=newComment);
+				commentValidator = CommentValidator(itemName=vote,itemOwner=user1,survey=surveyName,commenter=commenter);
+				comment.put();
+				commentValidator.put();
+				return render_template('failure.html',message="Comment successfully added!");
+		else:
+				return render_template('failure.html',message="You already have commented on this item!");
+
+
+
 
 @app.route('/viewresults')
 def viewResults():
 	form = cgi.FieldStorage();
-	survey = form['survey'].value;
+	surveyName = form['survey'].value;
+	survey = surveyName.replace("__"," ");
         user = form['user'].value;
 	owner = users.User(user);
+	commenter = users.get_current_user();
 	items = db.GqlQuery("SELECT * FROM Item WHERE survey = :1 and owner = :2",survey,owner);
 	voteList = [];
 	for item in items:
@@ -153,7 +206,11 @@ def viewResults():
 		win_count = db.GqlQuery("SELECT * FROM Vote WHERE name = :1 and survey = :2 and owner = :3",item.name,survey,owner);
 		for win1 in win_count:
 			winNumber = win1.win;
-		resultString = item.name +"###" +str(winNumber);
+		comment = db.GqlQuery("SELECT * FROM Comments WHERE itemName = :1 AND itemOwner = :2 AND survey = :3",item.name,owner,survey);
+		newComment="";
+		for c in comment:
+			newComment = c.comment;	
+		resultString = item.name +"###" +str(winNumber) +"###"+newComment;
 		voteList.append(resultString);
 	return render_template('results.html',results=voteList);
 
@@ -184,7 +241,9 @@ def addItems():
                                 item = Item(name=option);
                                 item.survey = surveyName;
                                 item.owner = user;
-	                        item.put();
+                                search1 = Search(name=option,entityType="item",survey=surveyName,owner=user);
+                                item.put();
+                                search1.put();
 	return render_template('survey_confirmation.html',survey=surveyName,option=optionList);
 
 @app.route('/deleteItem')
@@ -209,6 +268,8 @@ def deleteItem():
 	newSurvey.put();
 	oldItem = db.GqlQuery("SELECT * FROM Item WHERE name = :1 and owner = :2 and survey = :3",item,owner,survey);
 	db.delete(oldItem);
+	oldSearch = db.GqlQuery("SELECT * FROM Search WHERE name = :1 and owner = :2 and survey = :3 and entityType = :4",item,owner,survey,"item");
+	db.delete(oldSearch);
 	return render_template('survey_confirmation.html',survey=survey,option=oldValues);
 
 @app.route('/uploadfile',methods=['GET','POST'])
@@ -228,17 +289,21 @@ def uploadFile():
 		optionList.remove(surveyName);
 		newSurvey = Survey(name=surveyName,owner=owner,values=optionList);
 		newSurvey.put();
+		search = Search(name=surveyName,owner=owner,entotyType="Survey",survey=surveyName);
+		search.put();
 		for item in optionList:
 			newItem = Item(name=item,survey=surveyName,owner=owner);
+			search1 = Search(name=item,owner=owner,entotyType="item",survey=surveyName);
 			newItem.put();
+			search1.put();
 		return render_template('survey_confirmation.html',survey=surveyName,option=optionList);
 @app.route('/download')
 def download():
 	form = cgi.FieldStorage();
 	rawOption = form['voteon'].value;
-        optionList = rawOption.split("__by__");
-        surveyName = optionList[0].replace("__"," ");
-        user = users.User(optionList[1].strip());
+	optionList = rawOption.split("__by__");
+	surveyName = optionList[0].replace("__"," ");
+	user = users.User(optionList[1].strip());
 	items = db.GqlQuery("SELECT * FROM Item WHERE owner = :1 and survey = :2",user,surveyName.strip());
 	itemList = [];
 	for item in items:
@@ -251,3 +316,21 @@ def download():
 			yield text;
 		yield "</CATEGORY>";
 	return Response(generate(), mimetype='text/csv');
+
+@app.route('/search')
+def search():
+	form = cgi.FieldStorage();
+	value = form['search'].value;
+	searchValue = ".*" + value + ".*";
+	searchString = db.GqlQuery("Select * from Search");
+	searchList = [];
+	for search in searchString:
+		match = re.search(searchValue,search.name);
+		if match:
+			string = search.name + "###" + search.entityType + "###" + search.survey + "###" + str(search.owner);
+			searchList.append(string);
+	return render_template('searchresult.html',searchList=searchList);
+
+
+
+

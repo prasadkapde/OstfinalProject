@@ -1,10 +1,42 @@
 {% extends "base.html" %}
 
 {% block content %}
+<head>
+    <meta charset="utf-8" />
+    <title>jQuery UI Datepicker - Default functionality</title>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
+    <script src="http://code.jquery.com/jquery-1.8.3.js"></script>
+    <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+    <link rel="stylesheet" href="/resources/demos/style.css" />
+    <script>
+    $(function() { value="01/31/2012"
+        $( "#datepicker" ).datepicker();
+    });
+    </script>
+</head>
     <h1 id="">Create a Survey</h1>
     <form action='/addsurvey'>	
 	Survey Name:<input type="text" name=sname value="Survey Name"><br>
 	Options    :<input type="text" name= options value="options"><br>
+	Select Expiration Date:<p><input type="text" id="datepicker" name=dateValue value="11/30/2012" /></p>
+	Select Hours:<select name="hours">
+  				{% set counter = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]  %}
+  				{% for count in counter %}
+  				<option value="{{count}}">{{count}}</option>
+  				{% endfor %}
+				</select>
+	Select Minutes:<select name="minutes">
+  				{% set counter = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59]   %}
+  				{% for count in counter %}
+  				<option value="{{count}}">{{count}}</option>
+  				{% endfor %}
+				</select>
+	Select Seconds:<select name="seconds">
+  				{% set counter = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59]   %}
+  				{% for count in counter %}
+  				<option value="{{count}}">{{count}}</option>
+  				{% endfor %}
+				</select>
     	<p><input type="submit" value="Go!"/></p>
     </form>
 {% endblock %}

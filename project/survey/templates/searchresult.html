@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h1>Search Results</h1>
+		<table border = 1>
+			<tr>	
+				<td>Name</td>
+				<td>Type</td>
+				<td>Look In Survey</td>
+				<td>Survey By</td>
+			</tr>
+		{% for i in searchList %}
+			{% set c = i.split("###") %}
+			<tr>	
+				<td>{{c[0]}}</td>
+				<td>{{c[1]}}</td>
+				<td>{{c[2]}}</td>
+				<td>{{c[3]}}</td>
+			</tr>
+		{% endfor %}
+		</table>
+	<form action='/'>
+		<p><input type="submit"value="Go Back">
+	</form>	
+{% endblock %}

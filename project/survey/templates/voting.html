@@ -10,7 +10,8 @@
         {% endfor %}
 	<input type=hidden name=survey value={{surveys}}>
 	<input type=hidden name=user value={{user}}>
-	<p><input type="submit" value="Vote!"/></p>
+	<p><input type="submit" name=vote value="Vote!"/>
+    <input type=submit name=comment value="Comment!" /> <input type=text name=commentText></p>
     </form>
     <form action='/viewresults'>
 	<input type=hidden name=survey value={{surveys}}>
