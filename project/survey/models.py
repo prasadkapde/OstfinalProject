@@ -1,8 +1,4 @@
 from google.appengine.ext import db
-class UserData(db.Model):
-		user=db.StringProperty()
-		voteHistory=db.StringProperty()
-		createdSurveyHistory=db.StringProperty()
 class Item(db.Model):
 	    	name=db.StringProperty()
     		image=db.BlobProperty()
@@ -18,13 +14,6 @@ class Vote(db.Model):
 		owner=db.UserProperty();
 		survey=db.StringProperty();
 		win=db.IntegerProperty();
-class VoteValidator(db.Model):
-		name=db.StringProperty();
-		owner=db.UserProperty();
-		survey=db.StringProperty();
-		voter=db.UserProperty();
-class UploadData(db.Model):
-		data=db.BlobProperty();
 class Comments(db.Model):
 		itemName=db.StringProperty();
 		itemOwner=db.UserProperty();

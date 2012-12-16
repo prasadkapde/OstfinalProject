@@ -5,18 +5,19 @@
 
 	{{data}}
 	<form method=get action=startup>
-	<input type=radio name=startup value=create>Create A New Survey<br>
-	<input type=radio name=startup value=listmysurvey>List My Surveys<br>
-	<input type=radio name=startup value=listallsurvey>List All Surveys<br>
-	<input type=radio name=startup value=addItems>Add Items To My Survey<br>
-	<input type=radio name=startup value=delItems>Delete Items From My Survey<br>
-	<input type=radio name=startup value=upload>Upload New Survey<br>
-	<input type=radio name=startup value=download>Download Survey<br>
-	<input type=radio name=startup value=delete>Delete<br>
-	<input type=radio name=startup value=vote checked>Vote!<br>
+	<input type=radio name=startup value="create">Create A New Survey<br>
+	<input type=radio name=startup value="listmysurvey">List My Surveys<br>
+	<input type=radio name=startup value="listallsurvey">List All Surveys<br>
+	<input type=radio name=startup value="addItems">Add Items To My Survey<br>
+	<input type=radio name=startup value="delItems">Delete Items From My Survey<br>
+	<input type=radio name=startup value="upload">Upload New Survey<br>
+	<input type=radio name=startup value="download">Download Survey<br>
+	<input type=radio name=startup value="rename">Rename My Survey<br>
+	<input type=radio name=startup value="reset">Reset Expiration Time<br>
+	<input type=radio name=startup value="delete">Delete My Survey<br>
 	<input type=submit value="Go!!">
 	</form>
-	<form action='/search'>
+	<form name="search_data" action='/search' onsubmit="return Search_TextField_Validator()">
 		<p><input type="submit"value="Search"><input type=text name="search" value="Search"></p>
 	</form>	
 {% endblock %}

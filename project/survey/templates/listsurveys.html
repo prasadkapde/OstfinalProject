@@ -1,21 +1,58 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <head>
+            <script Language="JavaScript">
+        <!-- 
+        function Add_TextField_Validator()
+        {
+            var textbox = document.forms["add_data"]["additems"].value;
+            if (textbox == "" || textbox == null)
+            {
+                alert("Please provide some options!");
+                return false;
+            }
+            var pattern = /^[0-9a-zA-Z ,]+$/;
+            if (!textbox.match(pattern))
+            {
+                alert("Only numbers,alphabets,spaces and commas allowed as text input!");
+                return false;
+            }
+            var text = textbox.split(",");
+      		var counter = 0;
+      		for(var i = 0 ;i<text.length;i++)
+      		{
+        	for(var j = i + 1 ; j < text.length;j++)
+        	{
+          		if(text[i] == text[j]){
+            	counter = counter + 1
+         		}
+        	}
+      		}
+      		if (counter > 0){
+        		alert("Duplicate values in option is not allwed.");
+        		return false;
+      		}
+            return true;
+        }
+        -->
+        </script>
+    </head>
     <h1 id="">Listing Surveys For {{for_user}}</h1>
 	{% if path == 'vote' %}
 		<form action='/generatevotingpage'>
 		{% for i in surveys %}
                 {% set c = i.replace(" ","__") %}
-                <br><input type=radio name=voteon value={{c}} checked>{{i}}
+                <br><input type=radio name=voteon value="{{i}}" checked>{{i}}
 		 {% endfor %}
 	        <p><input type="submit" value="I Wanna Vote On This Survey!"/></p>
     		</form>
 	{% else %}
 	{% if path == 'add' %}
-		<form action='/addItems'>
+		<form name="add_data" action='/addItems' onsubmit="return Add_TextField_Validator()">
 		{% for i in surveys %}
                 {% set c = i.replace(" ","__") %}
-                <br><input type=radio name=addon value={{c}} checked>{{i}}
+                <br><input type=radio name=addon value="{{i}}" checked>{{i}}
 	        {% endfor %}
 		<p>Add These Items To The Selected Survey<input type=text name=additems /></p>
 		<p><input type="submit" value="Add Items To This Survey"/></p>
@@ -25,7 +62,7 @@
 			<form action='/download'>
 	        	        {% for i in surveys %}
         	       			 {% set c = i.replace(" ","__") %}
-		                	 <br><input type=radio name=voteon value={{c}} checked>{{i}}
+		                	 <br><input type=radio name=voteon value="{{i}}" checked>{{i}}
               		        {% endfor %}
 				<p><input type=submit value="Download This Survey"></p>
 			</form>
@@ -33,9 +70,9 @@
 		<form action='/generatevotingpage'>
 		{% for i in surveys %}
                 {% set c = i.replace(" ","__") %}
-                <br><input type=radio name=voteon value={{c}} checked>{{i}}
+                <br><input type=radio name=voteon value="{{i}}" checked>{{i}}
 	        {% endfor %}
-		<input type=hidden name=delete value=delete />
+		<input type=hidden name=delete value="delete" />
 		<p><input type="submit" value="Delete Items From This Survey"/></p>
         	</form>
 		{% endif %}

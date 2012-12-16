@@ -1,23 +1,61 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <head>
+            <script Language="JavaScript">
+        <!-- 
+        function Comment_TextField_Validator()
+        {
+            var textbox = document.forms["comment_data"]["commentText"].value;
+            if (textbox == "" || textbox == null)
+            {
+                alert("Please write some comment!");
+                return false;
+            }
+            var pattern = /^[0-9a-zA-Z ,]+$/;
+            if (!textbox.match(pattern))
+            {
+                alert("Only numbers,alphabets,spaces and commas allowed as text input!");
+                return false;
+            }
+            return true;
+        }
+        -->
+        </script>
+    </head>
     {% if path == 'vote' %}
     <h1 id="">Vote for {{surveys}} by {{user}}</h1>
     <form action='/registervote'>
         {% for i in options %}
                         {% set c = i.replace(" ","__") %}
-                        <br><input type=radio name=voteon value={{c}} checked>{{i}}
+                        <br><input type=radio name=voteon value="{{i}}" checked>{{i}}
         {% endfor %}
-	<input type=hidden name=survey value={{surveys}}>
-	<input type=hidden name=user value={{user}}>
+	<input type=hidden name=survey value="{{surveys}}">
+	<input type=hidden name=user value="{{user}}">
 	<p><input type="submit" name=vote value="Vote!"/>
+    <br>
+    <hr>
+    <br>
+                                                        Comment On Items
+    </form>
+    <form name="comment_data" action='/registervote' onsubmit="return Comment_TextField_Validator()">
+        {% for i in options %}
+                        {% set c = i.replace(" ","__") %}
+                        <br><input type=radio name=voteon value="{{i}}" checked>{{i}}
+        {% endfor %}
+    <input type=hidden name=survey value="{{surveys}}">
+    <input type=hidden name=user value="{{user}}">
     <input type=submit name=comment value="Comment!" /> <input type=text name=commentText></p>
     </form>
+    <br>
+    <hr>
+    <br>
     <form action='/viewresults'>
-	<input type=hidden name=survey value={{surveys}}>
-        <input type=hidden name=user value={{user}}>
+	<input type=hidden name=survey value="{{surveys}}">
+        <input type=hidden name=user value="{{user}}">
         <input type="submit" value="View Results!"/>
     </form>
+    
     <form action='/'>
         <input type="submit" value="Go Back To Home Page!"/>
     </form>
@@ -26,10 +64,10 @@
     <form action='/deleteItem'>
 	{% for i in options %}
                         {% set c = i.replace(" ","__") %}
-                        <br><input type=radio name=voteon value={{c}} checked>{{i}}
+                        <br><input type=radio name=voteon value="{{i}}" checked>{{i}}
         {% endfor %}
-	<input type=hidden name=survey value={{surveys}}>
-	<input type=hidden name=options value={{options}}>
+	<input type=hidden name=survey value="{{surveys}}">
+	<input type=hidden name=options value="{{options}}">
         <p><input type="submit" value="Delete!"/></p>
     </form>
    {% endif %}
