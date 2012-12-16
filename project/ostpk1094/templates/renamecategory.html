@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Pick A Category To Delete</h1>
+			<script Language="JavaScript">
+		<!-- 
+		function Rename_TextField_Validator()
+		{
+			var textbox = document.forms["rename_data"]["renameText"].value;
+			if (textbox == "" || textbox == null)
+			{
+   				alert("You can not rename a survey with a null string!");
+   				return false;
+			}
+			var pattern = /^[0-9a-zA-Z ,]+$/;
+			if (!textbox.match(pattern))
+			{
+   				alert("Only numbers,alphabets,spaces and commas allowed as text input!");
+   				return false;
+			}
+			return true;
+		}
+		-->
+		</script>
+			<form name="rename_data" action='/renameCategory' onsubmit="return Rename_TextField_Validator()">
+				{% for i in surveys %}
+                	<br><input type=radio name=renamesurvey value="{{i}}" checked>{{i}}
+		 		{% endfor %}
+		 		<table border = 0>
+		 			<tr>
+	        <td>Enter New Name For Selected Survey</td><td><input type=text name=renameText value="rename"></td>
+	        <tr>
+	        </table>
+	        <input type="submit" value="Rename This Survey!"/></p>
+    		</form>
+{% endblock %}

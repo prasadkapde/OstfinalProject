@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Pick A Category To Delete</h1>
+
+			<form action='/deleteCategory'>
+				{% for i in surveys %}
+                	<br><input type=radio name=deletesurvey value="{{i}}" checked>{{i}}
+		 		{% endfor %}
+	        <p><input type="submit" value="Delete This Survey!"/></p>
+    		</form>
+{% endblock %}

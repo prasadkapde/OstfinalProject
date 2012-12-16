@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1 id="">Listing All Survey Results.</h1>
+    <font size=2>*If One Or More Items Are Not Displayed Here, That Means They Received No Votes</font>
+    <table border=1>
+	<tr>
+		<td>Item</td>
+		<td>Survey Name</td>
+		<td>Owner</td>
+		<td>Number Of Votes</td>
+		<td>Comments</td>
+	</tr>
+       	{% for i in results %}
+			<tr>
+			{% set c = i.split("###") %}
+			<td>{{c[0]}}</td>
+			<td>{{c[1]}}</td>
+			<td>{{c[2]}}</td>
+			<td>{{c[3]}}</td>
+			<td>{{c[4]}}</td>
+			</tr>
+	{% endfor %}
+	</table>
+        
+{% endblock %}
+

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1 id="">Survey Confirmation</h1>
+    
+        	{{survey}} added successfully<br>
+		The Added Options For The Survey Are:
+		{% for i in option %}
+		<br>{{i}}
+		{% endfor %}
+    
+{% endblock %}
+

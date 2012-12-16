@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1 id="">Survey Results</h1>
+    <table border=1>
+	<tr>
+		<td>Item</td>
+		<td>Number Of Votes</td>
+		<td>Your Comments</td>
+	</tr>
+       	{% for i in results %}
+			<tr>
+			{% set c = i.split("###") %}
+			<td>{{c[0]}}</td>
+			<td>{{c[1]}}</td>
+			<td>{{c[2]}}</td>
+			</tr>
+	{% endfor %}
+	</table>
+        
+{% endblock %}
+

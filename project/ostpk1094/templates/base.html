@@ -1,0 +1,33 @@
+<html>
+    <head>
+    	<script Language="JavaScript">
+		<!-- 
+		function Search_TextField_Validator()
+		{
+			var textbox = document.forms["search_data"]["search"].value;
+			if (textbox == "" || textbox == null)
+			{
+   				alert("You can not search without providing a search key!");
+   				return false;
+			}
+			var pattern = /^[0-9a-zA-Z ,]+$/;
+			if (!textbox.match(pattern))
+			{
+   				alert("Only numbers,alphabets,spaces and commas allowed as text input!");
+   				return false;
+			}
+			return true;
+		}
+		-->
+		</script>
+		
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+        <title>{% block title %}OstFinalProject{% endblock %}</title>
+    </head>
+    <body>
+        {% block content %}{% endblock %}
+    </body>
+    <form  name = "homePage" action='/'>
+    	<br><input type="submit" value="Go Back To HomePage"><br>
+    </form>
+</html>

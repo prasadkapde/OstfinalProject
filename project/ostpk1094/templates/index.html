@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+	{{data}}<br>
+	What Do You Want To Do?<br><br>
+	<form method=get action=startup>
+	
+	Create A New Survey<br>
+	<ul>
+	<li>You Can Either Create A Surevy Manually or Upload an XML Having Survey Data.
+	<li>If You Upload An XML Expiration Date Would be Set To 30 December,2012.You Can Always Reset The Expiration Date By Choosing The Reset Menu.
+	</ul>
+	<input type=radio name=startup value="create">Create A New Survey<br>
+	<input type=radio name=startup value="upload">Upload New Survey<br><br>
+	
+	List Survey,Vote On Them Or View Survey Specific Results.<br>
+	<input type=radio name=startup value="listmysurvey">List/Vote My Surveys<br>
+	<input type=radio name=startup value="listallsurvey">List/Vote All Surveys<br><br>
+	
+	Edit My Surveys<br>
+	<input type=radio name=startup value="addItems">Add Items To My Survey<br>
+	<input type=radio name=startup value="delItems">Delete Items From My Survey<br>
+	<input type=radio name=startup value="rename">Rename My Survey<br>
+	<input type=radio name=startup value="reset">Reset Expiration Time<br>
+	<input type=radio name=startup value="delete">Delete My Survey<br><br>
+	
+	Download Surveys<br>
+	<input type=radio name=startup value="download">Download Survey<br><br>
+	View All results<br>
+	<input type=radio name=startup value="allresults" checked>View All Results<br><br>
+
+	<input type=submit value="Go!!">
+	</form>
+	Search Data
+	<form name="search_data" action='/search' onsubmit="return Search_TextField_Validator()">
+		<p><input type="submit"value="Search"><input type=text name="search" value="Search"></p>
+	</form>	
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+<head>
+    <meta charset="utf-8" />
+    <title>jQuery UI Datepicker - Default functionality</title>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
+    <script src="http://code.jquery.com/jquery-1.8.3.js"></script>
+    <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+    <link rel="stylesheet" href="/resources/demos/style.css" />
+    <script>
+    $(function() { value="01/31/2012"
+        $( "#datepicker" ).datepicker();
+    });
+    </script>
+    <script Language="JavaScript">
+    <!-- 
+    function Survey_TextField_Validator()
+    {
+      var textbox = document.forms["add_data"]["sname"].value;
+      var textbox1 = document.forms["add_data"]["options"].value;
+      if (textbox == "" || textbox == null)
+      {
+          alert("You can not create survey without providing a name!");
+          return false;
+      }
+      var pattern = /^[0-9a-zA-Z ,'?]+$/;
+      if (!textbox.match(pattern))
+      {
+          alert("Only numbers,alphabets,spaces and commas allowed as text input!");
+          return false;
+      }
+      if (textbox1 == "" || textbox1 == null)
+      {
+          alert("Atleast one item is expected in order to create a new survey!");
+          return false;
+      }
+      var pattern = /^[0-9a-zA-Z ,]+$/;
+      if (!textbox1.match(pattern))
+      {
+          alert("Only numbers,alphabets,spaces and commas allowed as text input!");
+          return false;
+      }
+      var text = textbox1.split(",");
+      var counter = 0;
+      for(var i = 0 ;i<text.length;i++)
+      {
+        for(var j = i + 1 ; j < text.length;j++)
+        {
+          if(text[i] == text[j]){
+            counter = counter + 1
+          }
+        }
+      }
+      if (counter > 0){
+        alert("Duplicate values in option is not allwed.");
+        return false;
+      }
+      return true;
+    }
+    -->
+    </script>
+</head>
+    <h1 id="">Create a Survey</h1>
+    <ul>
+    <li> Please Note That Duplicate Values Are Not Allowed In Options.
+    </ul>
+  <form name="add_data" action='/addsurvey' onsubmit="return Survey_TextField_Validator()">	
+    <table border = 0>
+      <tr>
+	<td>Enter Survey Name:<br><font size=2>(example: Do you like Football? or Operating System)</font><br></td>
+  <td><input type="text" name="sname" value="Survey Name"><td>
+  <tr>
+	<td>Enter Comma Separated Option List:<br><font size=2>(example: Windows 8,Linux)</font><br></td><td><input type="text" name= "options" value="options"><br></td>
+  <br>
+</tr>
+<tr>
+	<td>Select Expiration Date:</td><td><p><input type="text" id="datepicker" name="dateValue" /></p></td>
+</tr>
+<tr>
+	<td>Select Hours:</td><td><select name="hours">
+  				{% set counter = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]  %}
+  				{% for count in counter %}
+  				<option value="{{count}}">{{count}}</option>
+  				{% endfor %}
+				</select></td>
+</tr>
+<tr>
+	<td>Select Minutes:</td><td><select name="minutes">
+  				{% set counter = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59]   %}
+  				{% for count in counter %}
+  				<option value="{{count}}">{{count}}</option>
+  				{% endfor %}
+				</select></td>
+</tr>
+<tr>
+	<td>Select Seconds:</td><td><select name="seconds">
+  				{% set counter = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59]   %}
+  				{% for count in counter %}
+  				<option value="{{count}}">{{count}}</option>
+  				{% endfor %}
+				</select></td>
+</tr>
+    <tr>	<td><input type="submit" value="Create Survey!"/></td></tr>
+  </table>
+    </form>
+{% endblock %}

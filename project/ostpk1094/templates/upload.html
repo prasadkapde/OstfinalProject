@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<head>
+		<script Language="JavaScript">
+		<!-- 
+		function File_Validator()
+		{
+			var textbox = document.forms["upload_data"]["filename"].value;
+			if (textbox == "" || textbox == null)
+			{
+   				alert("Select a file to upload!");
+   				return false;
+			}
+			return true;
+		}
+		-->
+		</script>
+	</head>
+	<h1> Upload The Xml File Having Survey data </h1>
+	<form name="upload_data" method=POST enctype="multipart/form-data" action='/uploadfile' onsubmit="return File_Validator()">
+	<input type = file name=filename>
+	<input type= submit value ="Upload">
+</form>
+{% endblock %}
+
