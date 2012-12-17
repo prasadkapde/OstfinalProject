@@ -14,14 +14,17 @@ from google.appengine.api import users
 import xml.dom.minidom
 cgitb.enable();
 
+#1. This is the handler for home page. It redirects to homepage.
 @app.route('/index')
 def index():
 	return render_template('index.html',data="Welcome!")
 
+#1. This is the handler for home page. It redirects to homepage.
 @app.route('/')
 def index():
         return render_template('index.html',data="Welcome!")
 
+#2. This handler gets the request from the homepage. Based on the radio button selected, it re-directs request to appropriate page.
 @app.route('/startup')
 def startup():
 	form = cgi.FieldStorage();
@@ -126,6 +129,8 @@ def startup():
 		else:
 			return render_template('failure.html',message="You don't have any categories to reset. Create Category first.");
 
+#3. This handler handles the expiration date updation. 
+#It basically updates the expiration date of the selected survey and redirects request to the confirmation page.
 @app.route('/updateExpiration')
 def updateExpiration():
 	form = cgi.FieldStorage();
@@ -152,6 +157,8 @@ def updateExpiration():
 	newSurvey.put();
 	return render_template('failure.html',message="Update Successful.");
 
+#4. This handler handles addition of new survey. 
+#If a survey with same name is already present it redirects the request to error page, else it adds survey in datastore.
 @app.route('/addsurvey')
 def addSurvey():
 	form = cgi.FieldStorage();
@@ -194,6 +201,7 @@ def addSurvey():
 	else:
 		return render_template('failure.html',message="You already have created this survey! Please create a different survey.");
 		
+# A generic to delete data from datastore.
 def deleteGeneric(surveyName):
 	user = users.get_current_user();
 	surveys = db.GqlQuery("SELECT * FROM Survey WHERE owner = :1 AND name = :2",user,surveyName);
@@ -209,6 +217,7 @@ def deleteGeneric(surveyName):
 	commentValidator = db.GqlQuery("SELECT * FROM CommentValidator where itemOwner = :1 and survey = :2",user,surveyName);
 	db.delete(commentValidator);
 
+#5. This Handler handles deletion of a survey. Up on deletion the request is redirected to a confirmation page.
 @app.route('/deleteCategory')
 def deleteCategory():
 	form = cgi.FieldStorage();
@@ -216,6 +225,7 @@ def deleteCategory():
 	deleteGeneric(surveyName=surveyName);
 	return render_template('failure.html',message="Record Deleted!");
 
+#6. This handler renames a given survey. Up on renaming it redirects user to a confirmation page.
 @app.route('/renameCategory')
 def renameCategory():
 	form = cgi.FieldStorage();
@@ -258,12 +268,15 @@ def renameCategory():
 		deleteGeneric(surveyName=oldSurveyName);
 		return render_template('failure.html',message="Update Successful!");
 
+#7. This handler is used to create list of surveys for current user and then send this list to a page where it would be displayed.
 @app.route('/listmysurveys')
 def listMySurveys():
 	user = users.get_current_user();
 	surveys = db.GqlQuery("SELECT * FROM Survey WHERE owner = :1",user);
 	return render_template('mysurveys.html',surveys=surveys);
 
+# This handler generates the options for voting and deleting items. For voting it picks any two random values and passes it on
+# to page. For deleting it generates list of all options. If a survey has less than two options it redirects to an error page.
 @app.route('/generatevotingpage')
 def generateVotingPage():
 	form = cgi.FieldStorage();
@@ -296,6 +309,7 @@ def generateVotingPage():
 	if (path == "delete"):
 		return render_template('voting.html',surveys=surveyName,user=user,options=options,path=path);
 
+# Registers vote and comments for the given option.
 @app.route('/registervote')
 def registerVote():
 	form = cgi.FieldStorage();
@@ -356,7 +370,7 @@ def registerVote():
 
 
 
-
+#This handler produces the list containing results for the survey. The list is passed on to the web page to render.
 @app.route('/viewresults')
 def viewResults():
 	form = cgi.FieldStorage();
